@@ -1,18 +1,23 @@
-import logging; logging.basicConfig(level=logging.INFO)
-import asyncio, os, json, time
-from datetime import datetime
-from aiohttp import web
+from flask import Flask
+from flask import request,render_template
 
+app=Flask(__name__)
 
-async def index(request):
-    return web.Response(body=b'<h1>Awesome</h1>', content_type='text/html')
+@app.route('/',methods=['GET','POST'])
+def home():
+    return render_template('home.html')
 
+@app.route('/signin',methods=['GET'])
+def signin_form():
+    return render_template('form.html')
 
-def init():
-    app = web.Application()
-    app.add_routes([web.get('/', index)])
-    logging.info('Server started at 127.0.0.1...')
-    web.run_app(app, host='127.0.0.1', port=9000)
+@app.route('/signin',methods=['POST'])
+def signin():
+    username=request.form['username']
+    password=request.form['password']
+    if username=='admin' and password=='password':
+        return render_template('signin-ok.html',username=username)
+    return render_template('form.html',message='Bad username or password',username=username)
 
-
-init()
+if __name__=='__main__':
+    app.run()
